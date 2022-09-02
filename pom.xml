@@ -3,14 +3,14 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.wikmor</groupId>
-	<artifactId>lpc</artifactId>
-	<name>LPC</name>
-	<description>A chat formatting plugin for LuckPerms.</description>
+	<artifactId>lpc-nocensor</artifactId>
+	<name>LPC-NoCensor</name>
+	<description>A chat formatting plugin for LuckPerms. (with 1.19 censor bypass)</description>
 	<version>3.6.0</version>
 	<packaging>jar</packaging>
 	
 	<properties>
-		<author>wikmor</author>
+		<author>wikmor, Ravis96</author>
 		<main.class>me.wikmor.lpc.LPC</main.class>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -12,10 +12,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -36,11 +38,11 @@ public final class LPC extends JavaPlugin implements Listener {
 	}
 
 	@Override
-	public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
+	public boolean onCommand(final @NotNull CommandSender sender, final @NotNull Command command, final @NotNull String label, final String[] args) {
 		if (args.length == 1 && "reload".equals(args[0])) {
 			reloadConfig();
 
-			sender.sendMessage(colorize("&aLPC has been reloaded."));
+			sender.sendMessage(colorize("&aLPC-NoCensor has been reloaded."));
 			return true;
 		}
 
@@ -48,7 +50,7 @@ public final class LPC extends JavaPlugin implements Listener {
 	}
 
 	@Override
-	public List<String> onTabComplete(final CommandSender sender, final Command command, final String alias, final String[] args) {
+	public List<String> onTabComplete(final @NotNull CommandSender sender, final @NotNull Command command, final @NotNull String alias, final String[] args) {
 		if (args.length == 1)
 			return Collections.singletonList("reload");
 
@@ -57,6 +59,8 @@ public final class LPC extends JavaPlugin implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onChat(final AsyncPlayerChatEvent event) {
+		event.setCancelled(true);
+
 		final String message = event.getMessage();
 		final Player player = event.getPlayer();
 
@@ -64,7 +68,7 @@ public final class LPC extends JavaPlugin implements Listener {
 		final CachedMetaData metaData = this.luckPerms.getPlayerAdapter(Player.class).getMetaData(player);
 		final String group = metaData.getPrimaryGroup();
 
-		String format = getConfig().getString(getConfig().getString("group-formats." + group) != null ? "group-formats." + group : "chat-format")
+		String format = Objects.requireNonNull(getConfig().getString(getConfig().getString("group-formats." + group) != null ? "group-formats." + group : "chat-format"))
 				.replace("{prefix}", metaData.getPrefix() != null ? metaData.getPrefix() : "")
 				.replace("{suffix}", metaData.getSuffix() != null ? metaData.getSuffix() : "")
 				.replace("{prefixes}", metaData.getPrefixes().keySet().stream().map(key -> metaData.getPrefixes().get(key)).collect(Collectors.joining()))
@@ -72,12 +76,13 @@ public final class LPC extends JavaPlugin implements Listener {
 				.replace("{world}", player.getWorld().getName())
 				.replace("{name}", player.getName())
 				.replace("{displayname}", player.getDisplayName())
-				.replace("{username-color}", metaData.getMetaValue("username-color") != null ? metaData.getMetaValue("username-color") : "")
-				.replace("{message-color}", metaData.getMetaValue("message-color") != null ? metaData.getMetaValue("message-color") : "");
+				.replace("{username-color}", metaData.getMetaValue("username-color") != null ? Objects.requireNonNull(metaData.getMetaValue("username-color")) : "")
+				.replace("{message-color}", metaData.getMetaValue("message-color") != null ? Objects.requireNonNull(metaData.getMetaValue("message-color")) : "");
 
 		format = colorize(translateHexColorCodes(getServer().getPluginManager().isPluginEnabled("PlaceholderAPI") ? PlaceholderAPI.setPlaceholders(player, format) : format));
 
-		event.setFormat(format.replace("{message}", player.hasPermission("lpc.colorcodes") && player.hasPermission("lpc.rgbcodes")
+		final String finalFormat = format;
+		player.getServer().broadcastMessage(finalFormat.replace("{message}", player.hasPermission("lpc.colorcodes") && player.hasPermission("lpc.rgbcodes")
 				? colorize(translateHexColorCodes(message)) : player.hasPermission("lpc.colorcodes") ? colorize(message) : player.hasPermission("lpc.rgbcodes")
 				? translateHexColorCodes(message) : message).replace("%", "%%"));
 	}

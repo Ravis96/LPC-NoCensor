@@ -1,5 +1,7 @@
-# LPC Configuration
+# LPC-NoCensor Configuration
 # Please read the https://luckperms.net/wiki/Prefixes,-Suffixes-&-Meta before you set up.
+#
+# FORK OF ORIGINAL LPC: https://github.com/Ravis96/LPC-NoCensor
 #
 # Placeholders:
 # {message} - the chat message
